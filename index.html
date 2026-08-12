@@ -847,98 +847,174 @@
        PROJECTS
     ============================== */
 
-    .projects-grid {
-      display: grid;
+   .projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 50px;
+}
 
-      grid-template-columns:
-        repeat(3, 1fr);
+.project-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
 
-      gap: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(109,124,255,0.12),
+      rgba(168,85,247,0.07)
+    ),
+    var(--card);
 
-      margin-top: 50px;
-    }
+  border: 1px solid rgba(109,124,255,0.22);
 
-    .project-card {
-      overflow: hidden;
+  box-shadow:
+    0 18px 45px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.06);
 
-      border-radius: 20px;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
 
-      background:
-        var(--card);
+.project-card:hover {
+  transform: translateY(-8px);
 
-      border:
-        1px solid
-        var(--card-border);
+  border-color: rgba(109,124,255,0.45);
 
-      transition:
-        transform 0.25s ease,
-        border-color 0.25s ease;
-    }
+  box-shadow:
+    0 25px 55px rgba(0,0,0,0.32),
+    0 0 30px rgba(109,124,255,0.10);
+}
 
-    .project-card:hover {
-      transform:
-        translateY(-5px);
+.project-cover {
+  height: 190px;
 
-      border-color:
-        rgba(109,124,255,0.30);
-    }
+  display: grid;
+  place-items: center;
 
-    .project-cover {
-      height: 190px;
+  position: relative;
+  overflow: hidden;
 
-      display: grid;
-      place-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(109,124,255,0.20),
+      rgba(168,85,247,0.13)
+    );
 
-      background:
-        linear-gradient(
-          135deg,
-          #111936,
-          #151026
-        );
+  color: #c7d2ff;
 
-      color: #bfc7ff;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 1px;
 
-      font-size: 30px;
-      font-weight: 900;
-    }
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-    .project-content {
-      padding: 22px;
-    }
+.project-cover::before {
+  content: "";
+  position: absolute;
 
-    .project-content h3 {
-      font-size: 18px;
-    }
+  width: 180px;
+  height: 180px;
 
-    .project-content p {
-      margin-top: 8px;
+  top: -90px;
+  right: -70px;
 
-      color: var(--muted);
+  background: rgba(109,124,255,0.16);
 
-      font-size: 13px;
-    }
+  border-radius: 50%;
 
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
+  filter: blur(25px);
 
-      gap: 7px;
+  pointer-events: none;
+}
 
-      margin-top: 16px;
-    }
+.project-cover::after {
+  content: "";
 
-    .project-tags span {
-      padding: 5px 8px;
+  position: absolute;
 
-      border-radius: 999px;
+  width: 120px;
+  height: 120px;
 
-      background:
-        rgba(255,255,255,0.045);
+  bottom: -70px;
+  left: -50px;
 
-      color: #bfc7d8;
+  background: rgba(168,85,247,0.12);
 
-      font-size: 10px;
-    }
+  border-radius: 50%;
+
+  filter: blur(25px);
+
+  pointer-events: none;
+}
+
+.project-content {
+  padding: 25px;
+}
+
+.project-content h3 {
+  margin: 0;
+
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.project-content p {
+  margin-top: 10px;
+
+  color: var(--muted);
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 20px;
+}
+
+.project-tags span {
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: rgba(109,124,255,0.09);
+
+  border: 1px solid rgba(109,124,255,0.16);
+
+  color: #b9c1ff;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 900px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-cover {
+    height: 180px;
+  }
+}
+
 
     /* ==============================
        AI SECTION
