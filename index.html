@@ -2480,21 +2480,205 @@
       .textContent =
       new Date().getFullYear();
 
+    /* AI Assistant */
 
-    /* Temporary AI button */
+const aiInput = document.getElementById("aiInput");
+const aiSend = document.getElementById("aiSend");
+const aiMessages = document.getElementById("aiMessages");
+const aiButton = document.getElementById("aiButton");
 
-document
-  .getElementById("aiButton")
-  .addEventListener(
-    "click",
-    function () {
+let aiHistory = [];
 
-      alert(
-        "AI Assistant will be connected in the next development..."
+
+/* Add message to chat */
+function addAIMessage(role, text) {
+
+  const message = document.createElement("div");
+
+  message.className =
+    role === "user"
+      ? "ai-message ai-user"
+      : "ai-message ai-bot";
+
+  if (role === "assistant") {
+    message.innerHTML =
+      "<strong>AI Assistant</strong><p></p>";
+
+    message.querySelector("p").textContent = text;
+  } else {
+    message.innerHTML =
+      "<strong>You</strong><p></p>";
+
+    message.querySelector("p").textContent = text;
+  }
+
+  aiMessages.appendChild(message);
+
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+
+
+/* Send message */
+async function sendAIMessage() {
+
+  const message = aiInput.value.trim();
+
+  if (!message) return;
+
+
+  /* Show user's message */
+  addAIMessage("user", message);
+
+
+  /* Clear input */
+  aiInput.value = "";
+
+
+  /* Disable button while waiting */
+  aiSend.disabled = true;
+  aiSend.textContent = "Thinking...";
+
+
+  try {
+
+    const response = await fetch(
+      "/.netlify/functions/chat",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          message: message,
+          history: aiHistory
+        })
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error || "AI request failed."
       );
 
     }
-  );
+
+
+    const answer =
+      data.answer ||
+      "Sorry, I couldn't generate a response.";
+
+
+    /* Save conversation */
+    aiHistory.push({
+      role: "user",
+      content: message
+    });
+
+    aiHistory.push({
+      role: "assistant",
+      content: answer
+    });
+
+
+    /* Keep only recent messages */
+    if (aiHistory.length > 12) {
+      aiHistory =
+        aiHistory.slice(-12);
+    }
+
+
+    /* Show AI response */
+    addAIMessage(
+      "assistant",
+      answer
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "AI Assistant error:",
+      error
+    );
+
+
+    addAIMessage(
+      "assistant",
+      "Sorry, something went wrong. Please try again."
+    );
+
+  } finally {
+
+    aiSend.disabled = false;
+    aiSend.textContent = "Send";
+
+    aiInput.focus();
+
+  }
+}
+
+
+/* Send button */
+aiSend.addEventListener(
+  "click",
+  sendAIMessage
+);
+
+
+/* Enter key */
+aiInput.addEventListener(
+  "keydown",
+  function (event) {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      sendAIMessage();
+
+    }
+
+  }
+);
+
+
+/* Floating AI button */
+aiButton.addEventListener(
+  "click",
+  function () {
+
+    const aiSection =
+      document.querySelector(".ai-section");
+
+    if (aiSection) {
+
+      aiSection.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    }
+
+    setTimeout(
+      function () {
+        aiInput.focus();
+      },
+      500
+    );
+
+  }
+);
+
 
   </script>
 
