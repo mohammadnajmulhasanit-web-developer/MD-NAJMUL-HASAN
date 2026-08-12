@@ -108,34 +108,37 @@
     }
 
 .section-label {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
 
-    padding: 10px 20px;
+    width: fit-content;
+    margin: 0 auto 22px;
 
-    border: 1px solid rgba(109,124,255,0.35);
-    border-radius: 14px;
+    padding: 14px 34px;
+
+    border: 1px solid rgba(109,124,255,0.45);
+    border-radius: 999px;
 
     background:
         linear-gradient(
             135deg,
-            rgba(109,124,255,0.18),
-            rgba(168,85,247,0.12)
+            rgba(109,124,255,0.22),
+            rgba(168,85,247,0.18)
         );
 
-    color: #c7d2ff;
+    color: #dbe4ff;
 
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
 
     box-shadow:
-        0 8px 25px rgba(80,70,200,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+        0 12px 35px rgba(80,70,200,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.10);
 
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
 }
 
     .section-title {
