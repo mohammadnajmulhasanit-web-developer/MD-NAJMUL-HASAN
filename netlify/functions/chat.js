@@ -1,107 +1,79 @@
 export default async (req) => {
-  // Only allow POST requests
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      {
-        status: 405,
-        headers: { "Content-Type": "application/json" }
-      }
-    );
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
   try {
     const body = await req.json();
-
-    const message =
-      typeof body.message === "string"
-        ? body.message.trim()
-        : "";
-
-    const history =
-      Array.isArray(body.history)
-        ? body.history
-            .filter(
-              (item) =>
-                item &&
-                (item.role === "user" || item.role === "assistant") &&
-                typeof item.content === "string"
-            )
-            .slice(-12)
-        : [];
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    const history = Array.isArray(body.history) ? body.history : [];
 
     if (!message) {
-      return new Response(
-        JSON.stringify({ error: "Message is required." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
-
-    if (message.length > 4000) {
-      return new Response(
-        JSON.stringify({ error: "Message is too long." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
+      return new Response(JSON.stringify({ error: "Message is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
-
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({
-          error: "OPENAI_API_KEY is not configured on Netlify."
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
+      return new Response(JSON.stringify({ error: "OPENAI_API_KEY Missing" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
-    const input = [
-      {
-        role: "developer",
-        content:
-          "You are MD. NAJMUL HASAN's professional website AI assistant. " +
-          "Answer questions about his public professional profile, skills, " +
-          "projects, web development, API integration, automation, AI work, " +
-          "services and ways to contact him. " +
-          "Be accurate, professional, concise and helpful. " +
-          "Never invent private information or credentials. " +
-          "If information is not available on the website, clearly say so."
-      },
-      ...history,
-      {
-        role: "user",
-        content: message
-      }
+    const systemPrompt = "You are 'MD. NAJMUL HASAN AI', an all-rounder smart AI assistant embedded in MD. NAJMUL HASAN's website. Answer questions about MD. NAJMUL HASAN's portfolio, web development skills, and background, as well as general world knowledge, science, programming, and general topics. Answer clearly in Bengali or English based on the user language.";
+
+    const formattedHistory = history
+      .filter((item) => item && (item.role === "user" || item.role === "assistant") && typeof item.content === "string")
+      .map((item) => ({ role: item.role, content: item.content }));
+
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...formattedHistory,
+      { role: "user", content: message }
     ];
 
-    const response = await fetch(
-      "https://api.openai.com/v1/responses",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-5-mini",
-          input,
-          store: false
-        })
-      }
-    );
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: messages,
+        temperature: 0.7
+      })
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
+      return new Response(JSON.stringify({ error: data?.error?.message || "OpenAI API error" }), {
+        status: response.status,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const answer = data.choices[0]?.message?.content || "কোনো উত্তর পাওয়া যায়নি।";
+
+    return new Response(JSON.stringify({ answer }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+};    if (!response.ok) {
       console.error("OpenAI API error:", data);
 
       return new Response(
